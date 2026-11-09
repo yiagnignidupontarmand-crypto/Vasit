@@ -1,4 +1,3 @@
-https://script.google.com/macros/s/AKfycbyQko6f0-iJm4SaUVnbGKRVhRR9hOQeNuAoD0hHOV444njG-XF-5d8Ea-HJE5BwV4ms/exec
 <!doctype html>
 <html lang="fr">
 <head>
@@ -308,12 +307,33 @@ footer li{list-style:none;margin:6px 0}
 </a>
 
 <script>
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQko6f0-iJm4SaUVnbGKRVhRR9hOQeNuAoD0hHOV444njG-XF-5d8Ea-HJE5BwV4ms/exec";
+
 function sendQuote(e){
   e.preventDefault();
-  var v=function(id){return document.getElementById(id).value};
-  var msg="Bonjour VATIS, je souhaite un devis.\n"+
-    "Nom : "+v('n')+"\nService : "+v('s')+"\nDate : "+(v('d')||"à préciser")+"\nVoyageurs : "+v('p');
-  window.open("https://wa.me/237657875495?text="+encodeURIComponent(msg),"_blank");
+  var v = function(id){ return document.getElementById(id).value };
+
+  var data = {
+    nom: v('n'),
+    service: v('s'),
+    date: v('d') || "à préciser",
+    voyageurs: v('p'),
+    page: location.href
+  };
+
+  // 1) Enregistrement dans Google Sheets (en arrière-plan)
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {"Content-Type": "text/plain;charset=utf-8"},
+    body: JSON.stringify(data)
+  }).catch(function(){});
+
+  // 2) Ouverture de WhatsApp
+  var msg = "Bonjour VATIS, je souhaite un devis.\n" +
+    "Nom : " + data.nom + "\nService : " + data.service +
+    "\nDate : " + data.date + "\nVoyageurs : " + data.voyageurs;
+  window.open("https://wa.me/237657875495?text=" + encodeURIComponent(msg), "_blank");
   return false;
 }
 </script>
